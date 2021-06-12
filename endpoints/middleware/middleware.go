@@ -3,9 +3,9 @@ package endpoints
 import (
 	"net/http"
 
+	envirorment "github.com/NedimUka/synonyms/models"
+	vm "github.com/NedimUka/synonyms/viewmodels"
 	"golang.org/x/net/context"
-
-	env "github.com/NedimUka/sysnonyms/models/envirorment"
 )
 
 type middlewareData struct {
@@ -55,15 +55,15 @@ func InitMiddleware(h http.HandlerFunc) http.HandlerFunc {
 		// Make sure that this middleware is executed first
 		requestID := r.Header.Get("X-Request-Id")
 		envRaw := r.Header.Get("X-Environment")
-		env := env.NotSelected
-		if envRaw == env.Test {
-			env = env.Test
+		env := envirorment.NotSelected
+		if envRaw == envirorment.Test {
+			env = envirorment.Test
 		}
-		if envRaw == env.Live {
-			env = env.Live
+		if envRaw == envirorment.Live {
+			env = envirorment.Live
 		}
 
-		data := &env.Data{
+		data := &vm.Data{
 			RequestID:   requestID,
 			Environment: env,
 		}
@@ -97,8 +97,8 @@ type Middlewares struct {
 
 // RequestData to retrieve the Data object from the context.
 // The *Data* object will be initialized if not present already
-func RequestData(r *http.Request) *env.Data {
-	return r.Context().Value(MiddlewareData).(*env.Data)
+func RequestData(r *http.Request) *vm.Data {
+	return r.Context().Value(MiddlewareData).(*vm.Data)
 }
 
 // Chain is used to call sequencially all middlewares

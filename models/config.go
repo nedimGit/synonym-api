@@ -1,4 +1,4 @@
-package config
+package models
 
 // Config stores application configuration
 type Config struct {

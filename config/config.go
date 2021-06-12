@@ -1,7 +1,7 @@
 package config
 
 import (
-	cfModels "github.com/NedimUka/synonyms/models/config"
+	cfModels "github.com/NedimUka/synonyms/models"
 )
 
 // AppConfig contains application configuration

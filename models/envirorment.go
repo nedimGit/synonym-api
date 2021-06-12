@@ -1,4 +1,4 @@
-package envirorment
+package models
 
 // Environment (Live or Test)
 type Environment = string

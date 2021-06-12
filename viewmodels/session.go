@@ -4,7 +4,7 @@ package viewmodels
 type Environment = string
 
 const (
-	// Not Selected
+	// NotSelected -
 	NotSelected Environment = "none"
 
 	// Live environment

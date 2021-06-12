@@ -3,6 +3,9 @@ package endpoints
 import (
 	"io"
 	"net/http"
+
+	m "github.com/NedimUka/synonyms/endpoints/middleware"
+	"github.com/NedimUka/synonyms/endpoints/synonym"
 )
 
 // HealthCheck method is used to check if server is live.
@@ -15,6 +18,6 @@ func Initialize() {
 	http.HandleFunc("/", HealthCheck)
 
 	// Used to add new word with synonym
-	// http.HandleFunc("/synonym/add", m.Chain(m.Post).Then(synonym.Add))
+	http.HandleFunc("/synonym/add", m.Chain(m.Post).Then(synonym.Add))
 
 }
