@@ -18,6 +18,6 @@ func Initialize() {
 	http.HandleFunc("/", HealthCheck)
 
 	// Used to add new word with synonym
-	http.HandleFunc("/synonym/add", m.Chain(m.Post).Then(synonym.Add))
+	http.HandleFunc("/synonym/word/add", m.Chain(m.Post).Then(synonym.AddWord))
 
 }

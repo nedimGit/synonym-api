@@ -37,8 +37,3 @@ func (sM AddSynonymRequest) Validate(r *http.Request) (bool, *AddSynonymResponse
 	// }
 	return true, addSynonymResponse
 }
-
-// Word - a base struct for handling synonyms
-type Word struct {
-	Word string
-}

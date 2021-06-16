@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	"log"
+	"regexp"
 
 	vm "github.com/NedimUka/synonyms/viewmodels"
 )
@@ -75,9 +76,11 @@ func (service *SynonymService) EditWord(word vm.Word, replacement vm.Word) (*[]v
 	// Check if word already exists
 	if val, ok := service.Synonyms[word.Word]; ok {
 
-		for _, word := range *val {
-			existingWord := &word
-			existingWord.Word = replacement.Word
+		for i, existingWord := range *val {
+
+			if existingWord.Word == word.Word {
+				(*val)[i].Word = replacement.Word
+			}
 		}
 		service.Synonyms[replacement.Word] = val
 		delete(service.Synonyms, word.Word)
@@ -106,5 +109,43 @@ func (service *SynonymService) RemoveSynonym(synonym vm.Word) (bool, error) {
 	}
 
 	return false, errors.New("The word and its synonyms does not exist")
+
+}
+
+// SearchSynonyms - Search all words
+func (service *SynonymService) SearchSynonyms(searchTerm vm.Word) ([]vm.Word, error) {
+
+	words := new([]vm.Word)
+	for key := range service.Synonyms {
+
+		match, err := regexp.Match(".*"+searchTerm.Word+".*", []byte(key))
+
+		if err != nil {
+			log.Printf("Unable to match word %v error %v ", searchTerm.Word, err)
+			continue
+		}
+
+		if match {
+			matchedWord := vm.Word{Word: key}
+			*words = append(*words, matchedWord)
+		}
+
+	}
+
+	return *words, nil
+
+}
+
+// GetSynonyms - Get synonyms for specific word
+func (service *SynonymService) GetSynonyms(word vm.Word) ([]vm.Word, error) {
+
+	// Check if word already exists
+	if val, ok := service.Synonyms[word.Word]; ok {
+
+		return *val, nil
+
+	}
+
+	return nil, errors.New("The word and its synonyms does not exist")
 
 }
