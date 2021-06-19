@@ -25,11 +25,11 @@ func main() {
 
 	services.Init()
 
-	instance := services.GetSynonymService()
+	instance := services.Instance()
 
 	log.Printf("**************************************************************")
 	log.Printf("Adding new word Cleaning")
-	instance.AddWords(vm.Word{Word: "Cleaning"})
+	instance.AddWords(&vm.Word{Word: "Cleaning"})
 
 	for k, v := range instance.Synonyms {
 		log.Printf("Key word %v", k)
@@ -39,7 +39,7 @@ func main() {
 	}
 	log.Printf("**************************************************************")
 	log.Printf("Adding Duplicate  word Cleaning")
-	instance.AddWords(vm.Word{Word: "Cleaning"})
+	instance.AddWords(&vm.Word{Word: "Cleaning"})
 
 	for k, v := range instance.Synonyms {
 		log.Printf("Key word %v", k)
@@ -93,7 +93,7 @@ func main() {
 
 	log.Printf("**************************************************************")
 	log.Printf("Search word containing letters (was)")
-	words, _ := instance.SearchSynonyms(vm.Word{Word: "Was"})
+	words, _ := instance.SearchWords(vm.Word{Word: "Was"})
 
 	for _, word := range words {
 		log.Printf("Word found %v", word)
@@ -102,7 +102,7 @@ func main() {
 
 	log.Printf("**************************************************************")
 	log.Printf("Search all words")
-	words, _ = instance.SearchSynonyms(vm.Word{Word: ""})
+	words, _ = instance.SearchWords(vm.Word{Word: ""})
 
 	for _, word := range words {
 		log.Printf("Word found %v", word)
@@ -111,7 +111,7 @@ func main() {
 
 	log.Printf("**************************************************************")
 	log.Printf("Adding new word Scrubing")
-	instance.AddWords(vm.Word{Word: "Scrubing"})
+	instance.AddWords(&vm.Word{Word: "Scrubing"})
 
 	for k, v := range instance.Synonyms {
 		log.Printf("Key word %v", k)
@@ -122,7 +122,7 @@ func main() {
 
 	log.Printf("**************************************************************")
 	log.Printf("Search all words that contains (ing)")
-	words, _ = instance.SearchSynonyms(vm.Word{Word: "ing"})
+	words, _ = instance.SearchWords(vm.Word{Word: "ing"})
 
 	for _, word := range words {
 		log.Printf("Word found %v", word)
@@ -130,7 +130,7 @@ func main() {
 	}
 
 	log.Printf("**************************************************************")
-	log.Printf("Get all words that of wodd ing")
+	log.Printf("Get all words for word ing")
 	words, _ = instance.GetSynonyms(vm.Word{Word: "ing"})
 
 	log.Printf("Synonnym for ing found %v", &words)

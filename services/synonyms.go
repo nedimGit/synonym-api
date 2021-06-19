@@ -1,11 +1,11 @@
 package services
 
 import (
-	"errors"
 	"log"
 	"regexp"
 
 	vm "github.com/NedimUka/synonyms/viewmodels"
+	status "github.com/NedimUka/synonyms/viewmodels/statusCodes"
 )
 
 // SynonymService - exported pointer to sysnonyms map
@@ -13,8 +13,9 @@ type SynonymService struct {
 	Synonyms map[string]*[]vm.Word
 }
 
-func GetSynonymService() SynonymService {
-	return synonymService
+// Instance - get instance of synonym service
+func Instance() *SynonymService {
+	return &synonymService
 }
 
 var synonymService SynonymService
@@ -27,7 +28,7 @@ func Init() {
 }
 
 // AddWords - Add new word without synonyms
-func (service *SynonymService) AddWords(word vm.Word) (*[]vm.Word, error) {
+func (service *SynonymService) AddWords(word *vm.Word) (*[]vm.Word, error) {
 
 	// Check if the word already exists
 	if val, ok := service.Synonyms[word.Word]; ok {
@@ -36,41 +37,39 @@ func (service *SynonymService) AddWords(word vm.Word) (*[]vm.Word, error) {
 	}
 
 	// If the word did not exist before register it and return the empty initialised slice of words
-	words := []vm.Word{word}
+	words := []vm.Word{*word}
 	service.Synonyms[word.Word] = &words
 	return &words, nil
 
 }
 
 // AddSynonym - Add new synonym to word
-func (service *SynonymService) AddSynonym(word vm.Word, synonym vm.Word) (*[]vm.Word, error) {
+func (service *SynonymService) AddSynonym(word vm.Word, synonym vm.Word) (*[]vm.Word, int) {
 
 	// Check if synonym already exists
 	if _, ok := service.Synonyms[synonym.Word]; ok {
-		return nil, errors.New("The word alreeay exists as a synonym")
+		return nil, status.ErrorSynonymAllreadyEsists
 	}
 
 	// Check if the word already exists
 	if val, ok := service.Synonyms[word.Word]; ok {
 
-		log.Printf("val %v", val)
-		log.Printf("val value %v", *val)
 		*val = append(*val, synonym)
 		service.Synonyms[synonym.Word] = val
-		return val, nil
+		return val, 0
 
 	}
 
-	return nil, errors.New("The word and its synonyms does not exist")
+	return nil, status.ErrorWordDoesNotExist
 
 }
 
 // EditWord - Edit existing word
-func (service *SynonymService) EditWord(word vm.Word, replacement vm.Word) (*[]vm.Word, error) {
+func (service *SynonymService) EditWord(word vm.Word, replacement vm.Word) (*[]vm.Word, int) {
 
 	//Check if new word aready exists
 	if _, ok := service.Synonyms[replacement.Word]; ok {
-		return nil, errors.New("Word already exists")
+		return nil, status.ErrorSynonymAllreadyEsists
 	}
 
 	// Check if word already exists
@@ -85,15 +84,15 @@ func (service *SynonymService) EditWord(word vm.Word, replacement vm.Word) (*[]v
 		service.Synonyms[replacement.Word] = val
 		delete(service.Synonyms, word.Word)
 
-		return val, nil
+		return val, 0
 
 	}
 
-	return nil, errors.New("The word and its synonyms does not exist")
+	return nil, status.ErrorWordDoesNotExist
 }
 
 // RemoveSynonym - Remove existing synonym
-func (service *SynonymService) RemoveSynonym(synonym vm.Word) (bool, error) {
+func (service *SynonymService) RemoveSynonym(synonym vm.Word) (bool, int) {
 
 	// Check if synonym already exists
 	if val, ok := service.Synonyms[synonym.Word]; ok {
@@ -104,16 +103,16 @@ func (service *SynonymService) RemoveSynonym(synonym vm.Word) (bool, error) {
 			}
 		}
 		delete(service.Synonyms, synonym.Word)
-		return true, nil
+		return true, 0
 
 	}
 
-	return false, errors.New("The word and its synonyms does not exist")
+	return false, status.ErrorWordDoesNotExist
 
 }
 
-// SearchSynonyms - Search all words
-func (service *SynonymService) SearchSynonyms(searchTerm vm.Word) ([]vm.Word, error) {
+// SearchWords - Search all words
+func (service *SynonymService) SearchWords(searchTerm vm.Word) ([]vm.Word, error) {
 
 	words := new([]vm.Word)
 	for key := range service.Synonyms {
@@ -137,15 +136,27 @@ func (service *SynonymService) SearchSynonyms(searchTerm vm.Word) ([]vm.Word, er
 }
 
 // GetSynonyms - Get synonyms for specific word
-func (service *SynonymService) GetSynonyms(word vm.Word) ([]vm.Word, error) {
+func (service *SynonymService) GetSynonyms(word vm.Word) ([]vm.Word, int) {
 
 	// Check if word already exists
 	if val, ok := service.Synonyms[word.Word]; ok {
 
-		return *val, nil
+		return *val, 0
 
 	}
 
-	return nil, errors.New("The word and its synonyms does not exist")
+	return nil, status.ErrorWordDoesNotExist
+
+}
+
+// GetWords - Get all words
+func (service *SynonymService) GetWords() ([]vm.Word, error) {
+
+	words := make([]vm.Word, 0)
+	// Check if word already exists
+	for k := range service.Synonyms {
+		words = append(words, vm.Word{Word: k})
+	}
+	return words, nil
 
 }
