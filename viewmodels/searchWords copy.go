@@ -42,10 +42,5 @@ func (swr *SearchWordsRequest) Validate(r *http.Request) (bool, *SearchWordsResp
 		return false, searchWordsRespnse
 	}
 
-	if len(swr.Word.Word) == 0 {
-		searchWordsRespnse.Code = status.ErrorMissingWord
-		searchWordsRespnse.Errors = append(searchWordsRespnse.Errors, Error{Code: status.ErrorMissingWord, Message: status.Text(status.ErrorMissingWord)})
-		return false, searchWordsRespnse
-	}
 	return true, searchWordsRespnse
 }

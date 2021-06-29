@@ -17,7 +17,6 @@ func AddWord(w http.ResponseWriter, r *http.Request) {
 
 	valid, addWordResponse := addWordRequest.Validate(r)
 
-	log.Printf("Is valid %v", valid)
 	if !valid {
 		log.Printf("invalid request received: %v\n", addWordRequest)
 		w.WriteHeader(http.StatusBadRequest)
@@ -26,10 +25,19 @@ func AddWord(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	addedWord, err := synonymService.Instance().AddWords(&addWordRequest.Word)
+	addedWord, errCode := synonymService.Instance().AddWords(&addWordRequest.Word)
 
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+	if errCode != 0 {
+		switch errCode {
+		case status.ErrorWordDoesNotExist:
+			addWordResponse.Code = int64(errCode)
+			addWordResponse.Errors = append(
+				addWordResponse.Errors,
+				vm.Error{Code: status.ErrorWordDoesNotExist,
+					Message: status.Text(status.ErrorWordDoesNotExist)})
+			break
+		}
+		w.WriteHeader(http.StatusBadRequest)
 		m, _ := json.Marshal(addWordResponse)
 		w.Write(m)
 
@@ -96,7 +104,6 @@ func SearchWords(w http.ResponseWriter, r *http.Request) {
 	}
 
 	words, err := synonymService.Instance().SearchWords(searchWordsRequest.Word)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		m, _ := json.Marshal(searchWordsresponse)

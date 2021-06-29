@@ -26,123 +26,177 @@ func main() {
 	services.Init()
 
 	instance := services.Instance()
+	go func() {
+		log.Printf("**************************************************************")
+		log.Printf("Adding new word Cleaning")
+		instance.AddWords(&vm.Word{Word: "Cleaning"})
 
-	log.Printf("**************************************************************")
-	log.Printf("Adding new word Cleaning")
-	instance.AddWords(&vm.Word{Word: "Cleaning"})
-
-	for k, v := range instance.Synonyms {
-		log.Printf("Key word %v", k)
-		for _, word := range *v {
-			log.Printf("Synonym word %v", word.Word)
+		for k, v := range instance.Synonyms {
+			log.Printf("Key word %v", k)
+			for _, word := range *v {
+				log.Printf("Synonym word %v", word.Word)
+			}
 		}
-	}
-	log.Printf("**************************************************************")
-	log.Printf("Adding Duplicate  word Cleaning")
-	instance.AddWords(&vm.Word{Word: "Cleaning"})
+	}()
 
-	for k, v := range instance.Synonyms {
-		log.Printf("Key word %v", k)
-		for _, word := range *v {
-			log.Printf("Synonym word %v", word.Word)
+	go func() {
+		log.Printf("**************************************************************")
+		log.Printf("Adding new word Cleaning")
+		instance.AddWords(&vm.Word{Word: "Cleaning"})
+
+		for k, v := range instance.Synonyms {
+			log.Printf("Key word %v", k)
+			for _, word := range *v {
+				log.Printf("Synonym word %v", word.Word)
+			}
 		}
-	}
-	log.Printf("**************************************************************")
-	log.Printf("Adding new synonym to Cleaning, Washing")
-	instance.AddSynonym(vm.Word{Word: "Cleaning"}, vm.Word{Word: "Washing"})
+	}()
 
-	for k, v := range instance.Synonyms {
-		log.Printf("Key word %v", k)
-		for _, word := range *v {
-			log.Printf("Synonym word %v", word.Word)
+	go func() {
+		log.Printf("**************************************************************")
+		log.Printf("Adding Duplicate  word Cleaning")
+		instance.AddWords(&vm.Word{Word: "Cleaning"})
+
+		for k, v := range instance.Synonyms {
+			log.Printf("Key word %v", k)
+			for _, word := range *v {
+				log.Printf("Synonym word %v", word.Word)
+			}
 		}
-	}
-	log.Printf("**************************************************************")
+	}()
 
-	log.Printf("Remove new synonym Cleaning, ")
-	instance.RemoveSynonym(vm.Word{Word: "Cleaning"})
+	go func() {
+		log.Printf("**************************************************************")
+		log.Printf("Adding new synonym to Cleaning, Washing")
+		instance.AddSynonym(vm.Word{Word: "Cleaning"}, vm.Word{Word: "Washing"})
 
-	for k, v := range instance.Synonyms {
-		log.Printf("Key word %v", k)
-		for _, word := range *v {
-			log.Printf("Synonym word %v", word.Word)
+		for k, v := range instance.Synonyms {
+			log.Printf("Key word %v", k)
+			for _, word := range *v {
+				log.Printf("Synonym word %v", word.Word)
+			}
 		}
-	}
 
-	log.Printf("**************************************************************")
-	log.Printf("Adding new synonym to Washing, Cleaning")
-	instance.AddSynonym(vm.Word{Word: "Washing"}, vm.Word{Word: "Cleaning"})
+	}()
+	go func() {
+		log.Printf("**************************************************************")
+		log.Printf("Remove new synonym Cleaning, ")
+		instance.RemoveSynonym(vm.Word{Word: "Cleaning"})
 
-	for k, v := range instance.Synonyms {
-		log.Printf("Key word %v", k)
-		for _, word := range *v {
-			log.Printf("Synonym word %v", word.Word)
+		for k, v := range instance.Synonyms {
+			log.Printf("Key word %v", k)
+			for _, word := range *v {
+				log.Printf("Synonym word %v", word.Word)
+			}
 		}
-	}
 
-	log.Printf("**************************************************************")
-	log.Printf("Editng to  Washing to Wash")
-	instance.EditWord(vm.Word{Word: "Washing"}, vm.Word{Word: "Wash"})
+	}()
+	go func() {
+		log.Printf("**************************************************************")
+		log.Printf("Adding new synonym to Washing, Cleaning")
+		instance.AddSynonym(vm.Word{Word: "Washing"}, vm.Word{Word: "Cleaning"})
 
-	for k, v := range instance.Synonyms {
-		log.Printf("Key word %v", k)
-		for _, word := range *v {
-			log.Printf("Synonym word %v", word.Word)
+		for k, v := range instance.Synonyms {
+			log.Printf("Key word %v", k)
+			for _, word := range *v {
+				log.Printf("Synonym word %v", word.Word)
+			}
 		}
-	}
 
-	log.Printf("**************************************************************")
-	log.Printf("Search word containing letters (was)")
-	words, _ := instance.SearchWords(vm.Word{Word: "Was"})
+	}()
+	go func() {
+		log.Printf("**************************************************************")
+		log.Printf("Editng to  Washing to Wash")
+		instance.EditWord(vm.Word{Word: "Washing"}, vm.Word{Word: "Wash"})
 
-	for _, word := range words {
-		log.Printf("Word found %v", word)
-
-	}
-
-	log.Printf("**************************************************************")
-	log.Printf("Search all words")
-	words, _ = instance.SearchWords(vm.Word{Word: ""})
-
-	for _, word := range words {
-		log.Printf("Word found %v", word)
-
-	}
-
-	log.Printf("**************************************************************")
-	log.Printf("Adding new word Scrubing")
-	instance.AddWords(&vm.Word{Word: "Scrubing"})
-
-	for k, v := range instance.Synonyms {
-		log.Printf("Key word %v", k)
-		for _, word := range *v {
-			log.Printf("Synonym word %v", word.Word)
+		for k, v := range instance.Synonyms {
+			log.Printf("Key word %v", k)
+			for _, word := range *v {
+				log.Printf("Synonym word %v", word.Word)
+			}
 		}
+
+	}()
+
+	for i := 0; i < 100; i++ {
+		go func() {
+			log.Printf("**************************************************************")
+			log.Printf("Editng to  Washing to Wash")
+			_, e := instance.EditWord(vm.Word{Word: "Washing"}, vm.Word{Word: "Wash"})
+			log.Printf("Error word %v", e)
+
+			for k, v := range instance.Synonyms {
+				log.Printf("Key word %v", k)
+				for _, word := range *v {
+					log.Printf("Synonym word %v", word.Word)
+				}
+			}
+
+		}()
 	}
 
-	log.Printf("**************************************************************")
-	log.Printf("Search all words that contains (ing)")
-	words, _ = instance.SearchWords(vm.Word{Word: "ing"})
+	go func() {
+		log.Printf("**************************************************************")
+		log.Printf("Search word containing letters (was)")
+		words, _ := instance.SearchWords(vm.Word{Word: "Was"})
 
-	for _, word := range words {
-		log.Printf("Word found %v", word)
+		for _, word := range words {
+			log.Printf("Word found %v", word)
 
-	}
+		}
 
-	log.Printf("**************************************************************")
-	log.Printf("Get all words for word ing")
-	words, _ = instance.GetSynonyms(vm.Word{Word: "ing"})
+		log.Printf("**************************************************************")
+		log.Printf("Search all words")
+		words, _ = instance.SearchWords(vm.Word{Word: ""})
 
-	log.Printf("Synonnym for ing found %v", &words)
+		for _, word := range words {
+			log.Printf("Word found %v", word)
 
-	log.Printf("**************************************************************")
-	log.Printf("Get all words that of wodrd (Cleaning)")
-	words, _ = instance.GetSynonyms(vm.Word{Word: "Cleaning"})
+		}
 
-	for _, word := range words {
-		log.Printf("Word found %v", word)
+	}()
+	go func() {
+		log.Printf("**************************************************************")
+		log.Printf("Adding new word Scrubing")
+		instance.AddWords(&vm.Word{Word: "Scrubing"})
 
-	}
+		for k, v := range instance.Synonyms {
+			log.Printf("Key word %v", k)
+			for _, word := range *v {
+				log.Printf("Synonym word %v", word.Word)
+			}
+		}
+
+	}()
+	go func() {
+		log.Printf("**************************************************************")
+		log.Printf("Search all words that contains (ing)")
+		words, _ := instance.SearchWords(vm.Word{Word: "ing"})
+
+		for _, word := range words {
+			log.Printf("Word found %v", word)
+
+		}
+
+	}()
+	go func() {
+		log.Printf("**************************************************************")
+		log.Printf("Get all words for word ing")
+		words, _ := instance.GetSynonyms(vm.Word{Word: "ing"})
+
+		log.Printf("Synonnym for ing found %v", &words)
+
+	}()
+	go func() {
+		log.Printf("**************************************************************")
+		log.Printf("Get all words that of wodrd (Cleaning)")
+		words, _ := instance.GetSynonyms(vm.Word{Word: "Cleaning"})
+
+		for _, word := range words {
+			log.Printf("Word found %v", word)
+
+		}
+	}()
 	// Start server
 	server := &http.Instance{}
 	server.Setup(context.Background(), httpConfig)

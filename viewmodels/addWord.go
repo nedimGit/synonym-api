@@ -2,7 +2,6 @@ package viewmodels
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	status "github.com/NedimUka/synonyms/viewmodels/statusCodes"
@@ -42,8 +41,6 @@ func (awr *AddWordRequest) Validate(r *http.Request) (bool, *AddWordResponse) {
 		addWordResponse.Errors = append(addWordResponse.Errors, Error{Code: status.IncorrectBodyFormat, Message: status.Text(status.IncorrectBodyFormat)})
 		return false, addWordResponse
 	}
-
-	log.Printf("awr %v", awr.Word.Word)
 
 	if len(awr.Word.Word) == 0 {
 		addWordResponse.Code = status.ErrorMissingWord

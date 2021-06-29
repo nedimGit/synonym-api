@@ -3,6 +3,8 @@ package services
 import (
 	"log"
 	"regexp"
+	"strings"
+	"sync"
 
 	vm "github.com/NedimUka/synonyms/viewmodels"
 	status "github.com/NedimUka/synonyms/viewmodels/statusCodes"
@@ -11,6 +13,7 @@ import (
 // SynonymService - exported pointer to sysnonyms map
 type SynonymService struct {
 	Synonyms map[string]*[]vm.Word
+	mu       sync.RWMutex
 }
 
 // Instance - get instance of synonym service
@@ -28,23 +31,32 @@ func Init() {
 }
 
 // AddWords - Add new word without synonyms
-func (service *SynonymService) AddWords(word *vm.Word) (*[]vm.Word, error) {
+func (service *SynonymService) AddWords(word *vm.Word) (*[]vm.Word, int64) {
+
+	// Lock map for cocurent access , and unlock it after operation is complete
+	service.mu.Lock()
+	defer service.mu.Unlock()
 
 	// Check if the word already exists
-	if val, ok := service.Synonyms[word.Word]; ok {
-		return val, nil
+	if _, ok := service.Synonyms[word.Word]; ok {
+		return nil, status.ErrorSynonymAllreadyEsists
 
 	}
 
 	// If the word did not exist before register it and return the empty initialised slice of words
 	words := []vm.Word{*word}
 	service.Synonyms[word.Word] = &words
-	return &words, nil
+
+	return &words, 0
 
 }
 
 // AddSynonym - Add new synonym to word
 func (service *SynonymService) AddSynonym(word vm.Word, synonym vm.Word) (*[]vm.Word, int) {
+
+	// Lock map for cocurent access , and unlock it after operation is complete
+	service.mu.Lock()
+	defer service.mu.Unlock()
 
 	// Check if synonym already exists
 	if _, ok := service.Synonyms[synonym.Word]; ok {
@@ -66,6 +78,10 @@ func (service *SynonymService) AddSynonym(word vm.Word, synonym vm.Word) (*[]vm.
 
 // EditWord - Edit existing word
 func (service *SynonymService) EditWord(word vm.Word, replacement vm.Word) (*[]vm.Word, int) {
+
+	// Lock map for cocurent access , and unlock it after operation is complete
+	service.mu.Lock()
+	defer service.mu.Unlock()
 
 	//Check if new word aready exists
 	if _, ok := service.Synonyms[replacement.Word]; ok {
@@ -94,6 +110,10 @@ func (service *SynonymService) EditWord(word vm.Word, replacement vm.Word) (*[]v
 // RemoveSynonym - Remove existing synonym
 func (service *SynonymService) RemoveSynonym(synonym vm.Word) (bool, int) {
 
+	// Lock map for cocurent access , and unlock it after operation is complete
+	service.mu.Lock()
+	defer service.mu.Unlock()
+
 	// Check if synonym already exists
 	if val, ok := service.Synonyms[synonym.Word]; ok {
 
@@ -114,10 +134,14 @@ func (service *SynonymService) RemoveSynonym(synonym vm.Word) (bool, int) {
 // SearchWords - Search all words
 func (service *SynonymService) SearchWords(searchTerm vm.Word) ([]vm.Word, error) {
 
-	words := new([]vm.Word)
+	// Lock map for cocurent access , and unlock it after operation is complete
+	service.mu.Lock()
+	defer service.mu.Unlock()
+
+	words := make([]vm.Word, 0)
 	for key := range service.Synonyms {
 
-		match, err := regexp.Match(".*"+searchTerm.Word+".*", []byte(key))
+		match, err := regexp.Match(".*"+strings.ToLower(searchTerm.Word)+".*", []byte(strings.ToLower(key)))
 
 		if err != nil {
 			log.Printf("Unable to match word %v error %v ", searchTerm.Word, err)
@@ -126,18 +150,21 @@ func (service *SynonymService) SearchWords(searchTerm vm.Word) ([]vm.Word, error
 
 		if match {
 			matchedWord := vm.Word{Word: key}
-			*words = append(*words, matchedWord)
+			words = append(words, matchedWord)
 		}
 
 	}
 
-	return *words, nil
+	return words, nil
 
 }
 
 // GetSynonyms - Get synonyms for specific word
 func (service *SynonymService) GetSynonyms(word vm.Word) ([]vm.Word, int) {
 
+	// Lock map for cocurent access , and unlock it after operation is complete
+	service.mu.Lock()
+	defer service.mu.Unlock()
 	// Check if word already exists
 	if val, ok := service.Synonyms[word.Word]; ok {
 
@@ -152,6 +179,9 @@ func (service *SynonymService) GetSynonyms(word vm.Word) ([]vm.Word, int) {
 // GetWords - Get all words
 func (service *SynonymService) GetWords() ([]vm.Word, error) {
 
+	// Lock map for cocurent access , and unlock it after operation is complete
+	service.mu.Lock()
+	defer service.mu.Unlock()
 	words := make([]vm.Word, 0)
 	// Check if word already exists
 	for k := range service.Synonyms {
